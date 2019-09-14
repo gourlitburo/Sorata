@@ -25,8 +25,9 @@ class CommandHandler implements CommandExecutor {
     } else if (subcommand.equalsIgnoreCase("tp-all-type") && args.length == 2) {
       plugin.teleportAll(player, args[1]);
       return true;
-    } else if (subcommand.equalsIgnoreCase("list-all")) {
-      List<Tameable> list = plugin.getPlayerTameables(player, null);
+    } else if (subcommand.equalsIgnoreCase("list-all") || (subcommand.equalsIgnoreCase("list-all-type") && args.length == 2)) {
+      String typeRequirement = subcommand.equalsIgnoreCase("list-all") ? null : args[1];
+      List<Tameable> list = plugin.getPlayerTameables(player, typeRequirement);
       StringBuilder sb = new StringBuilder();
       for (Tameable tameable : list) {
         String typeName = plugin.getClassShortName(tameable.getClass().getName()).replaceAll("^Craft", "");
@@ -36,6 +37,7 @@ class CommandHandler implements CommandExecutor {
         long z = Math.round(location.getZ());
         long distance = Math.round(location.distance(player.getLocation()));
         sb.append(String.format("%s at %d, %d, %d (distance %d blocks)", typeName, x, y, z, distance));
+        return true;
       }
       player.sendMessage(sb.toString());
     }
