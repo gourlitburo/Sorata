@@ -1,5 +1,6 @@
 package yy.gourlitburo.sorata;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.bukkit.Location;
@@ -28,7 +29,7 @@ class CommandHandler implements CommandExecutor {
     } else if (subcommand.equalsIgnoreCase("list-all") || (subcommand.equalsIgnoreCase("list-type") && args.length == 2)) {
       String typeRequirement = subcommand.equalsIgnoreCase("list-all") ? null : args[1];
       List<Tameable> list = plugin.getPlayerTameables(player, typeRequirement);
-      StringBuilder sb = new StringBuilder();
+      List<String> lines = new ArrayList<>();
       for (Tameable tameable : list) {
         String typeName = plugin.getClassShortName(tameable.getClass().getName()).replaceAll("^Craft", "");
         Location location = tameable.getLocation();
@@ -38,9 +39,9 @@ class CommandHandler implements CommandExecutor {
         long distance = Math.round(location.distance(player.getLocation()));
         String name = tameable.getCustomName();
         String nameComponent = name == null ? "" : String.format(" (%s)", name);
-        sb.append(String.format("%s%s at %d, %d, %d (distance %d blocks)", typeName, nameComponent, x, y, z, distance));
+        lines.add(String.format("%s%s at %d, %d, %d (distance %d blocks)", typeName, nameComponent, x, y, z, distance));
       }
-      player.sendMessage(sb.toString());
+      player.sendMessage(String.join("\n", lines));
       return true;
     }
     return false;
