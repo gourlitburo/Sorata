@@ -3,7 +3,7 @@ name: Sorata
 version: 0.0.0
 api-version: 1.14
 author: Zack Guard
-# description:
+description: A manager for owned tameables.
 commands:
   sorata:
     description: Use Sorata.
