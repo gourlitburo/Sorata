@@ -12,7 +12,8 @@ public class Main extends JavaPlugin {
   Logger logger = getLogger();
 
   String getClassShortName(String className) {
-    String[] parts = className.split(".");
+    logger.info(className);
+    String[] parts = className.split("\\.");
     return parts[parts.length - 1];
   }
 
