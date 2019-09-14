@@ -22,10 +22,10 @@ class CommandHandler implements CommandExecutor {
     if (subcommand.equalsIgnoreCase("tp-all")) {
       plugin.teleportAll(player, null);
       return true;
-    } else if (subcommand.equalsIgnoreCase("tp-all-type") && args.length == 2) {
+    } else if (subcommand.equalsIgnoreCase("tp-type") && args.length == 2) {
       plugin.teleportAll(player, args[1]);
       return true;
-    } else if (subcommand.equalsIgnoreCase("list-all") || (subcommand.equalsIgnoreCase("list-all-type") && args.length == 2)) {
+    } else if (subcommand.equalsIgnoreCase("list-all") || (subcommand.equalsIgnoreCase("list-type") && args.length == 2)) {
       String typeRequirement = subcommand.equalsIgnoreCase("list-all") ? null : args[1];
       List<Tameable> list = plugin.getPlayerTameables(player, typeRequirement);
       StringBuilder sb = new StringBuilder();

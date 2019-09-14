@@ -7,7 +7,7 @@ author: Zack Guard
 commands:
   sorata:
     description: Use Sorata.
-    usage: "Usage: /sorata (list-all | tp-all | tp-all-type <type>)"
+    usage: "Usage: /sorata (list-all | list-type <type> | tp-all | tp-type <type>)"
     permission: sorata.use
 permissions:
   sorata.use:
