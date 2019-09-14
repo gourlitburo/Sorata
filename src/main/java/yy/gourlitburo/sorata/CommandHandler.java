@@ -29,12 +29,13 @@ class CommandHandler implements CommandExecutor {
       List<Tameable> list = plugin.getPlayerTameables(player, null);
       StringBuilder sb = new StringBuilder();
       for (Tameable tameable : list) {
-        String typeName = plugin.getClassShortName(tameable.getClass().getName());
+        String typeName = plugin.getClassShortName(tameable.getClass().getName()).replaceAll("^Craft", "");
         Location location = tameable.getLocation();
         long x = Math.round(location.getX());
         long y = Math.round(location.getY());
         long z = Math.round(location.getZ());
-        sb.append(String.format("%s at %d, %d, %d", typeName, x, y, z));
+        long distance = Math.round(location.distance(player.getLocation()));
+        sb.append(String.format("%s at %d, %d, %d (distance %d blocks)", typeName, x, y, z, distance));
       }
       player.sendMessage(sb.toString());
     }
