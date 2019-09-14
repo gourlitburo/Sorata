@@ -1,9 +1,13 @@
 package yy.gourlitburo.sorata;
 
+import java.util.List;
+
+import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Tameable;
 
 class CommandHandler implements CommandExecutor {
   private static Main plugin;
@@ -14,12 +18,25 @@ class CommandHandler implements CommandExecutor {
   public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
     if (args.length == 0) return false;
     String subcommand = args[0];
+    Player player = (Player) sender;
     if (subcommand.equalsIgnoreCase("tp-all")) {
-      plugin.teleportAll((Player) sender, null);
+      plugin.teleportAll(player, null);
       return true;
     } else if (subcommand.equalsIgnoreCase("tp-all-type") && args.length == 2) {
-      plugin.teleportAll((Player) sender, args[1]);
+      plugin.teleportAll(player, args[1]);
       return true;
+    } else if (subcommand.equalsIgnoreCase("list-all")) {
+      List<Tameable> list = plugin.getPlayerTameables(player, null);
+      StringBuilder sb = new StringBuilder();
+      for (Tameable tameable : list) {
+        String typeName = plugin.getClassShortName(tameable.getClass().getName());
+        Location location = tameable.getLocation();
+        long x = Math.round(location.getX());
+        long y = Math.round(location.getY());
+        long z = Math.round(location.getZ());
+        sb.append(String.format("%s at %d, %d, %d", typeName, x, y, z));
+      }
+      player.sendMessage(sb.toString());
     }
     return false;
   }
