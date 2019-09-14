@@ -11,14 +11,27 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class Main extends JavaPlugin {
   Logger logger = getLogger();
 
-  void teleportAll(Player player) {
+  String getClassShortName(String className) {
+    String[] parts = className.split(".");
+    return parts[parts.length - 1];
+  }
+
+  boolean belongsToPlayer(Tameable tameable, Player player) {
+    return tameable.isTamed() && tameable.getOwner().getUniqueId().equals(player.getUniqueId());
+  }
+
+  void teleportAll(Player player, String classShortNameRequirement) {
     World world = player.getWorld();
     Collection<Tameable> tameables = world.getEntitiesByClass(Tameable.class);
     for (Tameable tameable : tameables) {
-      if (tameable.isTamed() && tameable.getOwner().getUniqueId().equals(player.getUniqueId())) {
+      String classShortName = getClassShortName(tameable.getClass().getName());
+      if (
+        (classShortNameRequirement == null || classShortNameRequirement.equalsIgnoreCase(classShortName))
+        && belongsToPlayer(tameable, player)
+      ) {
         boolean teleported = tameable.teleport(player);
         if (teleported) {
-          logger.info(String.format("Teleported %s's %s to player.", player.getName(), tameable.getClass().getName()));
+          logger.info(String.format("Teleported %s's %s to player.", player.getName(), classShortName));
         }
       }
     }

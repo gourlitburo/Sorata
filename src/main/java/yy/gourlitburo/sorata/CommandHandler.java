@@ -13,8 +13,12 @@ class CommandHandler implements CommandExecutor {
   @Override
   public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
     if (args.length == 0) return false;
-    if (args[0].equalsIgnoreCase("tp-all")) {
-      plugin.teleportAll((Player) sender);
+    String subcommand = args[0];
+    if (subcommand.equalsIgnoreCase("tp-all")) {
+      plugin.teleportAll((Player) sender, null);
+      return true;
+    } else if (subcommand.equalsIgnoreCase("tp-all-type") && args.length == 2) {
+      plugin.teleportAll((Player) sender, args[1]);
       return true;
     }
     return false;
