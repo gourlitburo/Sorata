@@ -39,9 +39,9 @@ class CommandHandler implements CommandExecutor {
         String name = tameable.getCustomName();
         String nameComponent = name == null ? "" : String.format(" (%s)", name);
         sb.append(String.format("%s%s at %d, %d, %d (distance %d blocks)", typeName, nameComponent, x, y, z, distance));
-        return true;
       }
       player.sendMessage(sb.toString());
+      return true;
     }
     return false;
   }
