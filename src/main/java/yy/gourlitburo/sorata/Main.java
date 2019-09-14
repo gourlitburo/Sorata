@@ -15,7 +15,7 @@ public class Main extends JavaPlugin {
     World world = player.getWorld();
     Collection<Tameable> tameables = world.getEntitiesByClass(Tameable.class);
     for (Tameable tameable : tameables) {
-      if (tameable.getOwner().getUniqueId().equals(player.getUniqueId())) {
+      if (tameable.isTamed() && tameable.getOwner().getUniqueId().equals(player.getUniqueId())) {
         boolean teleported = tameable.teleport(player);
         if (teleported) {
           logger.info(String.format("Teleported %s's %s to player.", player.getName(), tameable.getClass().getName()));
