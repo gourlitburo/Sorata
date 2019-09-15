@@ -28,18 +28,33 @@ class CommandHandler implements CommandExecutor {
       return true;
     } else if (subcommand.equalsIgnoreCase("list-all") || (subcommand.equalsIgnoreCase("list-type") && args.length == 2)) {
       String typeRequirement = subcommand.equalsIgnoreCase("list-all") ? null : args[1];
-      List<Tameable> list = plugin.getPlayerTameables(player, typeRequirement);
+      List<Object> list = plugin.getPlayerTameables(player, typeRequirement);
       List<String> lines = new ArrayList<>();
-      for (Tameable tameable : list) {
-        String typeName = plugin.getClassShortName(tameable.getClass().getName()).replaceAll("^Craft", "");
-        Location location = tameable.getLocation();
-        long x = Math.round(location.getX());
-        long y = Math.round(location.getY());
-        long z = Math.round(location.getZ());
-        long distance = Math.round(location.distance(player.getLocation()));
-        String name = tameable.getCustomName();
-        String nameComponent = name == null ? "" : String.format(" (%s)", name);
-        lines.add(String.format("%s%s at %d, %d, %d (distance %d blocks)", typeName, nameComponent, x, y, z, distance));
+      // TODO: dry
+      for (Object tameableObj : list) {
+        if (tameableObj instanceof Tameable) {
+          Tameable tameable = (Tameable) tameableObj;
+          String typeName = plugin.getClassShortName(tameable.getClass().getName()).replaceAll("^Craft", "");
+          Location location = tameable.getLocation();
+          long x = Math.round(location.getX());
+          long y = Math.round(location.getY());
+          long z = Math.round(location.getZ());
+          long distance = Math.round(location.distance(player.getLocation()));
+          String name = tameable.getCustomName();
+          String nameComponent = name == null ? "" : String.format(" (%s)", name);
+          lines.add(String.format("%s%s at %d, %d, %d (distance %d blocks)", typeName, nameComponent, x, y, z, distance));
+        } else if (tameableObj instanceof UnloadedTameable) {
+          UnloadedTameable unloadedTameable = (UnloadedTameable) tameableObj;
+          String typeName = plugin.getClassShortName(unloadedTameable.className).replaceAll("^Craft", "");
+          Location location = unloadedTameable.location;
+          long x = Math.round(location.getX());
+          long y = Math.round(location.getY());
+          long z = Math.round(location.getZ());
+          long distance = Math.round(location.distance(player.getLocation()));
+          String name = unloadedTameable.name;
+          String nameComponent = name == null ? "" : String.format(" (%s)", name);
+          lines.add(String.format("%s%s last seen at %d, %d, %d (distance %d blocks) [unloaded]", typeName, nameComponent, x, y, z, distance));
+        }
       }
       player.sendMessage(String.join("\n", lines));
       return true;
