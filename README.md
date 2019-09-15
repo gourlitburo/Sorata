@@ -4,8 +4,7 @@ A manager for owned tameables.
 
 ## Features
 
-* List or teleport all owned tameables, optionally by type (e.g. "wolf").
-* *(Planned) Keep track of owned tameables inside a chunk when it unloads and report this to the owner for retrieval.*
+* List or teleport all owned tameables, including those in unloaded chunks, optionally filtered by type (e.g. "wolf").
 
 ## License
 
