@@ -107,7 +107,8 @@ public class Main extends JavaPlugin {
     List<Map<?, ?>> unloadedTameablesStore = store.getMapList(STORE_UNLOADED_TAMEABLES_KEY);
     int addedCount = 0;
     for (Map<?, ?> unloadedTameableStore : unloadedTameablesStore) {
-      // TODO: check world exists
+      World world = Bukkit.getWorld(UUID.fromString((String) unloadedTameableStore.get("world_uuid")));
+      if (world == null) continue;
       addUnloadedTameable(new UnloadedTameable(unloadedTameableStore));
       ++addedCount;
     }
