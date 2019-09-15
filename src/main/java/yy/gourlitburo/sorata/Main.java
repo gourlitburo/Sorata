@@ -1,24 +1,34 @@
 package yy.gourlitburo.sorata;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Tameable;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class Main extends JavaPlugin {
+  private final String STORE_FILENAME = "store.yml";
+  private File storeLocation = new File(getDataFolder(), STORE_FILENAME);
+
   Logger logger = getLogger();
 
   private List<UnloadedTameable> unloadedTameables = new ArrayList<>();
 
   boolean addUnloadedTameable(Tameable tameable) {
     return unloadedTameables.add(new UnloadedTameable(tameable));
+  }
+
+  boolean addUnloadedTameable(UnloadedTameable unloadedTameable) {
+    return unloadedTameables.add(unloadedTameable);
   }
 
   boolean removeUnloadedTameable(UUID tameableUUID) {
@@ -35,7 +45,7 @@ public class Main extends JavaPlugin {
   }
 
   private boolean belongsToPlayer(UnloadedTameable unloadedTameable, Player player) {
-    return unloadedTameable.owner.getUniqueId().equals(player.getUniqueId());
+    return unloadedTameable.ownerUUID.equals(player.getUniqueId());
   }
 
   private boolean nameMatches(String a, String b) {
@@ -88,11 +98,20 @@ public class Main extends JavaPlugin {
     }
   }
 
-  // TODO: load unloadedTameables list from file
   @Override
   public void onEnable() {
+    YamlConfiguration store = YamlConfiguration.loadConfiguration(storeLocation);
+    List<Map<?, ?>> unloadedTameablesStore = store.getMapList("unloaded_tameables");
+    for (Map<?, ?> unloadedTameableStore : unloadedTameablesStore) {
+      // TODO: check world exists
+      addUnloadedTameable(new UnloadedTameable(unloadedTameableStore));
+    }
+
+    /* register command and events */
     getCommand("sorata").setExecutor(new CommandHandler(this));
     Bukkit.getPluginManager().registerEvents(new ChunkEventHandler(this), this);
+
+    /* hajimeyou, niisan! */
     logger.info("Sorata ready.");
   }
 
