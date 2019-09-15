@@ -3,6 +3,7 @@ package yy.gourlitburo.sorata;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -14,6 +15,41 @@ class CommandHandler implements CommandExecutor {
   private static Main plugin;
 
   CommandHandler(Main instance) { plugin = instance; }
+
+  private String getDisplayedClassName(String fullClassName) {
+    return plugin.getClassShortName(fullClassName).replaceAll("^Craft", "");
+  }
+
+  private String formatOwnedTameablesList(Player player, List<Object> tameableObjs) {
+    List<String> lines = new ArrayList<>();
+    for (Object tameableObj : tameableObjs) {
+      String typeName;
+      Location location;
+      String name;
+      String worldName;
+      if (tameableObj instanceof Tameable) {
+        Tameable tameable = (Tameable) tameableObj;
+        typeName = getDisplayedClassName(tameable.getClass().getName());
+        location = tameable.getLocation();
+        name = tameable.getCustomName();
+        worldName = tameable.getWorld().getName();
+      } else { // tameableObj instanceof UnloadedTameable
+        UnloadedTameable unloadedTameable = (UnloadedTameable) tameableObj;
+        typeName = getDisplayedClassName(unloadedTameable.className);
+        location = unloadedTameable.location;
+        name = unloadedTameable.name;
+        worldName = Bukkit.getWorld(unloadedTameable.worldUUID).getName();
+      }
+      long x = Math.round(location.getX());
+      long y = Math.round(location.getY());
+      long z = Math.round(location.getZ());
+      long distance = Math.round(location.distance(player.getLocation()));
+      String nameComponent = name == null ? "" : String.format(" (%s)", name);
+      lines.add(String.format("%s%s last seen at %d, %d, %d in world '%s' (distance %d blocks) [unloaded]", typeName, nameComponent, x, y, z, worldName, distance));
+    }
+    if (lines.isEmpty()) return "No owned tameables.";
+    else return String.join("\n", lines);
+  }
 
   @Override
   public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -29,34 +65,7 @@ class CommandHandler implements CommandExecutor {
     } else if (subcommand.equalsIgnoreCase("list-all") || (subcommand.equalsIgnoreCase("list-type") && args.length == 2)) {
       String typeRequirement = subcommand.equalsIgnoreCase("list-all") ? null : args[1];
       List<Object> list = plugin.getPlayerTameables(player, typeRequirement);
-      List<String> lines = new ArrayList<>();
-      // TODO: dry
-      for (Object tameableObj : list) {
-        if (tameableObj instanceof Tameable) {
-          Tameable tameable = (Tameable) tameableObj;
-          String typeName = plugin.getClassShortName(tameable.getClass().getName()).replaceAll("^Craft", "");
-          Location location = tameable.getLocation();
-          long x = Math.round(location.getX());
-          long y = Math.round(location.getY());
-          long z = Math.round(location.getZ());
-          long distance = Math.round(location.distance(player.getLocation()));
-          String name = tameable.getCustomName();
-          String nameComponent = name == null ? "" : String.format(" (%s)", name);
-          lines.add(String.format("%s%s at %d, %d, %d (distance %d blocks)", typeName, nameComponent, x, y, z, distance));
-        } else if (tameableObj instanceof UnloadedTameable) {
-          UnloadedTameable unloadedTameable = (UnloadedTameable) tameableObj;
-          String typeName = plugin.getClassShortName(unloadedTameable.className).replaceAll("^Craft", "");
-          Location location = unloadedTameable.location;
-          long x = Math.round(location.getX());
-          long y = Math.round(location.getY());
-          long z = Math.round(location.getZ());
-          long distance = Math.round(location.distance(player.getLocation()));
-          String name = unloadedTameable.name;
-          String nameComponent = name == null ? "" : String.format(" (%s)", name);
-          lines.add(String.format("%s%s last seen at %d, %d, %d (distance %d blocks) [unloaded]", typeName, nameComponent, x, y, z, distance));
-        }
-      }
-      player.sendMessage(String.join("\n", lines));
+      player.sendMessage(formatOwnedTameablesList(player, list));
       return true;
     }
     return false;
