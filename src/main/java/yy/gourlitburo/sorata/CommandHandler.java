@@ -27,25 +27,28 @@ class CommandHandler implements CommandExecutor {
       Location location;
       String name;
       String worldName;
+      String unloadedComponent;
       if (tameableObj instanceof Tameable) {
         Tameable tameable = (Tameable) tameableObj;
         typeName = getDisplayedClassName(tameable.getClass().getName());
         location = tameable.getLocation();
         name = tameable.getCustomName();
         worldName = tameable.getWorld().getName();
+        unloadedComponent = "";
       } else { // tameableObj instanceof UnloadedTameable
         UnloadedTameable unloadedTameable = (UnloadedTameable) tameableObj;
         typeName = getDisplayedClassName(unloadedTameable.className);
         location = unloadedTameable.location;
         name = unloadedTameable.name;
         worldName = Bukkit.getWorld(unloadedTameable.worldUUID).getName();
+        unloadedComponent = " [unloaded]";
       }
       long x = Math.round(location.getX());
       long y = Math.round(location.getY());
       long z = Math.round(location.getZ());
       long distance = Math.round(location.distance(player.getLocation()));
       String nameComponent = name == null ? "" : String.format(" (%s)", name);
-      lines.add(String.format("%s%s last seen at %d, %d, %d in world '%s' (distance %d blocks) [unloaded]", typeName, nameComponent, x, y, z, worldName, distance));
+      lines.add(String.format("%s%s at %d, %d, %d in world '%s' (distance %d blocks)%s", typeName, nameComponent, x, y, z, worldName, distance, unloadedComponent));
     }
     if (lines.isEmpty()) return "No owned tameables.";
     else return String.join("\n", lines);
