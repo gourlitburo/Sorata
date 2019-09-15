@@ -1,6 +1,7 @@
 package yy.gourlitburo.sorata;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -104,10 +105,13 @@ public class Main extends JavaPlugin {
   public void onEnable() {
     store = YamlConfiguration.loadConfiguration(storeLocation);
     List<Map<?, ?>> unloadedTameablesStore = store.getMapList(STORE_UNLOADED_TAMEABLES_KEY);
+    int addedCount = 0;
     for (Map<?, ?> unloadedTameableStore : unloadedTameablesStore) {
       // TODO: check world exists
       addUnloadedTameable(new UnloadedTameable(unloadedTameableStore));
+      ++addedCount;
     }
+    logger.info(String.format("Loaded %d unloadedTameables from store.", addedCount));
 
     /* register command and events */
     getCommand("sorata").setExecutor(new CommandHandler(this));
@@ -124,5 +128,11 @@ public class Main extends JavaPlugin {
       serialized.add(unloadedTameable.toMap());
     }
     store.set(STORE_UNLOADED_TAMEABLES_KEY, serialized);
+    try {
+      store.save(storeLocation);
+      logger.info(String.format("Wrote %d unloadedTameables to store.", serialized.size()));
+    } catch (IOException exp) {
+      logger.warning("Failed to write to store.");
+    }
   }
 }
