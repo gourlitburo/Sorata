@@ -1,5 +1,6 @@
 package yy.gourlitburo.sorata;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -37,5 +38,18 @@ class UnloadedTameable {
     this.location = tameable.getLocation();
     this.className = tameable.getClass().getName();
     this.name = tameable.getCustomName();
+  }
+
+  public Map<String, Object> toMap() {
+    Map<String, Object> map = new HashMap<>();
+    map.put("uuid", uuid.toString());
+    map.put("owner_uuid", ownerUUID.toString());
+    map.put("world_uuid", worldUUID.toString());
+    map.put("location_x", location.getX());
+    map.put("location_y", location.getY());
+    map.put("location_z", location.getZ());
+    map.put("class_name", className);
+    map.put("name", name);
+    return map;
   }
 }

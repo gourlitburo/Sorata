@@ -17,7 +17,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class Main extends JavaPlugin {
   private final String STORE_FILENAME = "store.yml";
+  private final String STORE_UNLOADED_TAMEABLES_KEY = "unloaded_tameables";
   private File storeLocation = new File(getDataFolder(), STORE_FILENAME);
+  private YamlConfiguration store;
 
   Logger logger = getLogger();
 
@@ -100,8 +102,8 @@ public class Main extends JavaPlugin {
 
   @Override
   public void onEnable() {
-    YamlConfiguration store = YamlConfiguration.loadConfiguration(storeLocation);
-    List<Map<?, ?>> unloadedTameablesStore = store.getMapList("unloaded_tameables");
+    store = YamlConfiguration.loadConfiguration(storeLocation);
+    List<Map<?, ?>> unloadedTameablesStore = store.getMapList(STORE_UNLOADED_TAMEABLES_KEY);
     for (Map<?, ?> unloadedTameableStore : unloadedTameablesStore) {
       // TODO: check world exists
       addUnloadedTameable(new UnloadedTameable(unloadedTameableStore));
@@ -115,5 +117,12 @@ public class Main extends JavaPlugin {
     logger.info("Sorata ready.");
   }
 
-  // TODO: save unloadedTameables list to file
+  @Override
+  public void onDisable() {
+    List<Map<String, Object>> serialized = new ArrayList<>();
+    for (UnloadedTameable unloadedTameable : unloadedTameables) {
+      serialized.add(unloadedTameable.toMap());
+    }
+    store.set(STORE_UNLOADED_TAMEABLES_KEY, serialized);
+  }
 }
