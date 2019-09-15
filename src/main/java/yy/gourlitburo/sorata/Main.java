@@ -10,8 +10,10 @@ import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Tameable;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -88,11 +90,27 @@ public class Main extends JavaPlugin {
 
   void teleportAll(Player player, String classShortNameRequirement) {
     for (Object tameableObj : getPlayerTameables(player, classShortNameRequirement)) {
-      Tameable tameable;
-      if (tameableObj instanceof Tameable) tameable = (Tameable) tameableObj;
-      else continue;
-      String classShortName = getClassShortName(tameable.getClass().getName());
-      boolean teleported = tameable.teleport(player);
+      String classShortName;
+      boolean teleported = false;
+      if (tameableObj instanceof Tameable) {
+        Tameable tameable = (Tameable) tameableObj;
+        classShortName = getClassShortName(tameable.getClass().getName());
+        teleported = tameable.teleport(player);
+      } else { // tameableObj instanceof UnloadedTameable
+        UnloadedTameable unloadedTameable = (UnloadedTameable) tameableObj;
+        classShortName = getClassShortName(unloadedTameable.className);
+        /* temporary load its chunk then attempt teleport */
+        World world = Bukkit.getWorld(unloadedTameable.worldUUID);
+        if (world != null) {
+          Chunk chunk = world.getChunkAt(unloadedTameable.location);
+          for (Entity entity : chunk.getEntities()) {
+            if (unloadedTameable.uuid.equals(entity.getUniqueId())) {
+              teleported = entity.teleport(player);
+              break;
+            }
+          }
+        }
+      }
       if (teleported) {
         logger.info(String.format("Teleported to %s their %s.", player.getName(), classShortName));
       } else {
