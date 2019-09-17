@@ -57,6 +57,10 @@ class CommandHandler implements CommandExecutor {
   @Override
   public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
     if (args.length == 0) return false;
+    if (!(sender instanceof Player)) {
+      sender.sendMessage("Only players can use Sorata.");
+      return true;
+    }
     String subcommand = args[0];
     Player player = (Player) sender;
     if (subcommand.equalsIgnoreCase("tp-all")) {
