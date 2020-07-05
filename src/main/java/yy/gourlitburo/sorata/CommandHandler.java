@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -26,29 +27,41 @@ class CommandHandler implements CommandExecutor {
       String typeName;
       Location location;
       String name;
-      String worldName;
+      World world;
       String unloadedComponent;
+
       if (tameableObj instanceof Tameable) {
         Tameable tameable = (Tameable) tameableObj;
         typeName = getDisplayedClassName(tameable.getClass().getName());
         location = tameable.getLocation();
         name = tameable.getCustomName();
-        worldName = tameable.getWorld().getName();
+        world = tameable.getWorld();
         unloadedComponent = "";
       } else { // tameableObj instanceof UnloadedTameable
         UnloadedTameable unloadedTameable = (UnloadedTameable) tameableObj;
         typeName = getDisplayedClassName(unloadedTameable.className);
         location = unloadedTameable.location;
         name = unloadedTameable.name;
-        worldName = Bukkit.getWorld(unloadedTameable.worldUUID).getName();
+        world = Bukkit.getWorld(unloadedTameable.worldUUID);
         unloadedComponent = " [unloaded]";
       }
+
+      String worldName = world.getName();
+
       long x = Math.round(location.getX());
       long y = Math.round(location.getY());
       long z = Math.round(location.getZ());
-      long distance = Math.round(location.distance(player.getLocation()));
+
+      Long distance = world.getUID().equals(player.getWorld().getUID())
+        ? Math.round(location.distance(player.getLocation()))
+        : null;
+      String distanceComponent = distance != null
+        ? String.format(" (%d blocks)", distance)
+        : "";
+
       String nameComponent = name == null ? "" : String.format(" (%s)", name);
-      lines.add(String.format("%s%s at %d, %d, %d in '%s' (%d blocks)%s", typeName, nameComponent, x, y, z, worldName, distance, unloadedComponent));
+
+      lines.add(String.format("%s%s at %d, %d, %d in '%s'%s%s", typeName, nameComponent, x, y, z, worldName, distanceComponent, unloadedComponent));
     }
     if (lines.isEmpty()) return "No owned tameables.";
     else return String.join("\n", lines);
