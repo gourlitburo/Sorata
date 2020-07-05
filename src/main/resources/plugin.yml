@@ -1,6 +1,6 @@
 main: yy.gourlitburo.sorata.Main
 name: Sorata
-version: 0.1.1
+version: 0.1.2
 api-version: 1.14
 author: Zack Guard
 description: A manager for owned tameables.

@@ -48,7 +48,7 @@ class CommandHandler implements CommandExecutor {
       long z = Math.round(location.getZ());
       long distance = Math.round(location.distance(player.getLocation()));
       String nameComponent = name == null ? "" : String.format(" (%s)", name);
-      lines.add(String.format("%s%s at %d, %d, %d in world '%s' (distance %d blocks)%s", typeName, nameComponent, x, y, z, worldName, distance, unloadedComponent));
+      lines.add(String.format("%s%s at %d, %d, %d in '%s' (%d blocks)%s", typeName, nameComponent, x, y, z, worldName, distance, unloadedComponent));
     }
     if (lines.isEmpty()) return "No owned tameables.";
     else return String.join("\n", lines);
